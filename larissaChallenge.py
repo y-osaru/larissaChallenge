@@ -3,6 +3,8 @@ import requests
 from time import sleep
 from bs4 import BeautifulSoup
 
+LARISSA = "武田羅梨沙多胡"
+
 def larissa(name):
 	param = {
 		"u":name
@@ -12,6 +14,15 @@ def larissa(name):
 	soup = BeautifulSoup(ht.text, "html.parser")
 	result = soup.find("div",class_="result2").find("div").text
 	return result.strip()
+
+def countHit(result):
+	hit = 0
+	hitIndex = []
+	for i in range(7):
+		if result[i] == LARISSA[i]:
+			hit += 1
+			hitIndex.append(i+1)
+	return hit,hitIndex
 
 def randSleep():
 	#ランダム待ち
@@ -84,17 +95,23 @@ def main():
 	random.shuffle(names)
 	print(names)
 	
+	maxHitResult = ['','',-1,[]]
 	for index,name in enumerate(names):
 		#診断
 		result = larissa(name)
 		
-		if result == "武田羅梨沙多胡":
+		if result == LARISSA:
 			print(str(index)+'：成功！：'+name+'/'+result)
 			break
 		else:
 			print(str(index)+'：失敗！：'+name+'/'+result)
+			hit,hitIndex = countHit(result)
+			if maxHitResult[2] < hit:
+				maxHitResult = [name,result,hit,hitIndex]
 			randSleep()
 	print('終了！！！！')
+	print('最大一致結果')
+	print('%s,%s,%d,[%s]' % (maxHitResult[0],maxHitResult[1],maxHitResult[2],",".join(map(str,maxHitResult[3]))))
 
 if __name__ == '__main__':
 	main()
